@@ -1452,6 +1452,13 @@ p.subtitle {
     margin-right: 10px;
 }
 
+.project-image {
+	width: 100px;
+	height: 85px;
+	border-radius: 50%;
+	object-fit: cover;
+  }
+  
 /* Animation */
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(-5px); }
