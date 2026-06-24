@@ -1,0 +1,1835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tajwar | Portfolio Admin</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"/>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════
+   COLOUR PALETTE — matches cool-gray skin
+   Nav:  #2b2b2b  |  Accent: #95a3a4
+   Bg:   #f0f0f0  |  White:  #ffffff
+   Text: #2b2b2b  |  Border: #d8d8d8
+══════════════════════════════════════════ */
+:root{
+  --nav:#2b2b2b; --nav-border:#1a1a1a; --nav-text:#cccccc; --nav-active:#ffffff;
+  --accent:#95a3a4; --accent-dk:#6b7b7c; --accent-lt:#b8c4c5;
+  --bg:#f0f0f0; --bg-card:#ffffff; --bg-input:#fafafa;
+  --text:#2b2b2b; --text-mid:#555555; --text-mute:#888888;
+  --border:#d8d8d8; --border-dk:#bbbbbb;
+  --danger:#c0392b; --danger-lt:#fdf0ef;
+  --success:#27ae60; --success-lt:#edfaf1;
+  --shadow:0 1px 4px rgba(0,0,0,.10); --shadow-md:0 3px 12px rgba(0,0,0,.13);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Roboto',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;}
+
+/* ── LAYOUT ── */
+.app{display:flex;min-height:100vh;}
+
+/* ── SIDEBAR ── */
+.sidebar{width:252px;background:var(--nav);border-right:1px solid var(--nav-border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;overflow-y:auto;}
+.sidebar-logo{padding:22px 20px 18px;border-bottom:1px solid rgba(255,255,255,.08);}
+.sidebar-logo h1{font-size:18px;font-weight:700;color:#fff;letter-spacing:.5px;}
+.sidebar-logo h1 span{color:var(--accent-lt);}
+.sidebar-logo p{font-size:10px;color:var(--nav-text);margin-top:3px;letter-spacing:2px;text-transform:uppercase;}
+.sidebar-nav{flex:1;padding:14px 0;}
+.nav-section-label{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,.3);padding:12px 20px 5px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 20px;cursor:pointer;color:var(--nav-text);font-size:13px;border-left:3px solid transparent;transition:all .18s;}
+.nav-item i{width:15px;text-align:center;font-size:13px;flex-shrink:0;}
+.nav-item:hover{background:rgba(255,255,255,.06);color:#fff;}
+.nav-item.active{color:#fff;border-left-color:var(--accent-lt);background:rgba(255,255,255,.1);font-weight:500;}
+.nav-badge{margin-left:auto;background:var(--accent);color:#fff;font-size:10px;padding:2px 7px;border-radius:10px;font-weight:700;}
+.sidebar-footer{padding:14px 20px;border-top:1px solid rgba(255,255,255,.08);font-size:11px;color:rgba(255,255,255,.35);}
+.status-dot{display:inline-block;width:7px;height:7px;background:var(--success);border-radius:50%;margin-right:6px;}
+
+/* ── MAIN ── */
+.main{margin-left:252px;flex:1;display:flex;flex-direction:column;min-height:100vh;}
+
+/* ── TOPBAR ── */
+.topbar{background:var(--nav);border-bottom:1px solid var(--nav-border);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.topbar-title{font-size:16px;font-weight:500;color:#fff;}
+.topbar-title span{color:var(--accent-lt);}
+.topbar-actions{display:flex;align-items:center;gap:10px;}
+.btn-preview{display:inline-flex;align-items:center;gap:7px;padding:7px 15px;background:transparent;border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.8);font-size:12px;font-family:'Roboto',sans-serif;border-radius:4px;cursor:pointer;transition:all .18s;text-decoration:none;}
+.btn-preview:hover{border-color:rgba(255,255,255,.6);color:#fff;background:rgba(255,255,255,.06);}
+.btn-save{display:inline-flex;align-items:center;gap:7px;padding:7px 18px;background:var(--accent);border:none;color:#fff;font-size:12px;font-family:'Roboto',sans-serif;border-radius:4px;cursor:pointer;font-weight:600;transition:all .18s;}
+.btn-save:hover{background:var(--accent-dk);}
+
+/* ── CONTENT ── */
+.content{padding:26px 28px;flex:1;}
+.panel{display:none;}
+.panel.active{display:block;}
+
+/* ── STAT CARDS ── */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+.stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:6px;padding:18px 20px;display:flex;flex-direction:column;gap:6px;box-shadow:var(--shadow);}
+.stat-label{font-size:10px;color:var(--text-mute);letter-spacing:1.5px;text-transform:uppercase;}
+.stat-value{font-size:30px;font-weight:700;line-height:1;color:var(--nav);}
+.stat-sub{font-size:11px;color:var(--text-mute);}
+.accent-bar{height:3px;border-radius:2px;background:var(--accent);margin-top:4px;width:40px;}
+
+/* ── SECTION CARD ── */
+.section-card{background:var(--bg-card);border:1px solid var(--border);border-radius:6px;margin-bottom:20px;overflow:hidden;box-shadow:var(--shadow);}
+.section-header{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:#fafafa;}
+.section-header h3{font-size:14px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px;}
+.section-header h3 i{color:var(--accent-dk);font-size:13px;}
+.section-body{padding:20px;}
+
+/* ── FORMS ── */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.form-row.three{grid-template-columns:1fr 1fr 1fr;}
+.form-row.single{grid-template-columns:1fr;}
+.form-group{display:flex;flex-direction:column;gap:5px;}
+.form-group label{font-size:11px;color:var(--text-mute);letter-spacing:.8px;text-transform:uppercase;font-weight:500;}
+.form-group input,.form-group textarea,.form-group select{background:var(--bg-input);border:1px solid var(--border);border-radius:4px;padding:8px 11px;color:var(--text);font-family:'Roboto',sans-serif;font-size:13px;outline:none;transition:border-color .18s;}
+.form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(149,163,164,.15);}
+.form-group textarea{resize:vertical;min-height:75px;}
+.form-hint{font-size:11px;color:var(--text-mute);margin-top:3px;font-style:italic;}
+
+/* ── SKILL ROW ── */
+.skill-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;padding:10px 12px;background:#fafafa;border:1px solid var(--border);border-radius:5px;}
+.skill-row input[type="text"]{width:190px;flex-shrink:0;}
+.skill-row input[type="range"]{flex:1;-webkit-appearance:none;height:4px;background:linear-gradient(90deg,var(--accent) 0%,var(--accent) var(--val,70%),#ddd var(--val,70%));border-radius:2px;border:none;cursor:pointer;outline:none;}
+.skill-row input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;background:var(--accent-dk);border-radius:50%;cursor:pointer;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+.skill-val{font-size:12px;color:var(--accent-dk);width:34px;text-align:right;font-weight:700;}
+
+/* ── TABLE ── */
+.data-table{width:100%;border-collapse:collapse;}
+.data-table th{text-align:left;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-mute);padding:9px 13px;border-bottom:2px solid var(--border);background:#fafafa;}
+.data-table td{padding:11px 13px;border-bottom:1px solid #f0f0f0;font-size:13px;vertical-align:middle;color:var(--text);}
+.data-table tr:last-child td{border-bottom:none;}
+.data-table tr:hover td{background:#f8f8f8;}
+
+/* ── BADGES ── */
+.badge{display:inline-block;padding:3px 9px;border-radius:3px;font-size:11px;font-weight:600;}
+.badge-automation{background:#e8eef0;color:#4a6a6e;}
+.badge-testcase{background:#e9f5ee;color:#2e7d50;}
+.badge-web{background:#f0edf7;color:#6444a0;}
+.badge-iot{background:#fdf0e6;color:#b5601a;}
+.badge-ml{background:#fdf5e0;color:#9e6c00;}
+
+/* ── ACTION BUTTONS ── */
+.action-btns{display:flex;gap:7px;}
+.btn-icon{display:inline-flex;align-items:center;justify-content:center;gap:5px;background:var(--bg);border:1px solid var(--border);color:var(--text-mute);padding:5px 10px;border-radius:4px;cursor:pointer;font-size:12px;transition:all .18s;font-family:'Roboto',sans-serif;}
+.btn-icon i{font-size:12px;}
+.btn-icon:hover{border-color:var(--accent);color:var(--accent-dk);background:#fff;}
+.btn-icon.danger:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-lt);}
+
+/* ── ADD BUTTON ── */
+.btn-add{display:inline-flex;align-items:center;gap:7px;padding:7px 16px;background:#fff;border:1px dashed var(--border-dk);color:var(--accent-dk);border-radius:4px;cursor:pointer;font-size:12px;font-family:'Roboto',sans-serif;transition:all .18s;font-weight:500;}
+.btn-add i{font-size:11px;}
+.btn-add:hover{background:var(--bg);border-color:var(--accent);color:var(--accent-dk);border-style:solid;}
+
+/* ── TIMELINE EDITOR ── */
+.timeline-editor-item{background:#fafafa;border:1px solid var(--border);border-radius:6px;padding:16px;margin-bottom:12px;border-left:3px solid var(--accent);}
+.timeline-editor-item .item-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.timeline-editor-item .item-title{font-size:13px;color:var(--text-mid);font-weight:600;}
+.dot-picker{display:flex;gap:7px;align-items:center;}
+.dot-opt{width:13px;height:13px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:border-color .15s;}
+.dot-opt.selected{border-color:#333;}
+.dot-opt.blue{background:#4a90c4;}
+.dot-opt.green{background:#27ae60;}
+.dot-opt.purple{background:#8e44ad;}
+
+/* ── CAROUSEL EDITOR ── */
+.carousel-item-ed{display:flex;gap:10px;align-items:center;background:#fafafa;border:1px solid var(--border);border-radius:5px;padding:10px 12px;margin-bottom:9px;}
+.carousel-item-ed input{flex:1;}
+.carousel-item-ed input.small{width:180px;flex:none;}
+
+/* ── SERVICE EDITOR ── */
+.service-ed-item{background:#fafafa;border:1px solid var(--border);border-radius:6px;padding:15px;margin-bottom:12px;border-left:3px solid var(--accent-lt);}
+
+/* ── FUN FACTS ── */
+.funfact-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.funfact-item{background:#fafafa;border:1px solid var(--border);border-radius:6px;padding:14px;display:flex;flex-direction:column;gap:7px;}
+.funfact-item label{font-size:10px;color:var(--text-mute);text-transform:uppercase;letter-spacing:1px;font-weight:500;}
+
+/* ── SOCIAL ITEMS ── */
+.social-item{display:flex;align-items:center;gap:12px;background:#fafafa;border:1px solid var(--border);border-radius:5px;padding:10px 13px;margin-bottom:9px;}
+.social-item .icon-col{font-size:17px;width:28px;text-align:center;color:var(--text-mid);}
+.social-item input{flex:1;}
+
+/* ── PROJECT FIELDS INFO BOX ── */
+.fields-info{background:#f5f8f5;border:1px solid #c8dfc8;border-radius:6px;padding:13px 16px;margin-bottom:18px;font-size:12px;color:var(--text-mid);line-height:1.8;}
+.fields-info strong{color:var(--text);display:block;margin-bottom:4px;}
+.field-tag{display:inline-block;background:#e8eef0;color:#4a6a6e;padding:2px 8px;border-radius:3px;font-size:11px;font-weight:600;margin:2px 3px 2px 0;}
+.field-tag.extra{background:#fdf5e0;color:#9e6c00;}
+
+/* ── SECTION DIVIDER IN MODAL ── */
+.modal-section-label{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-mute);padding:10px 0 6px;border-bottom:1px solid var(--border);margin:16px 0 14px;}
+.modal-section-label.first{margin-top:0;}
+.modal-section-label span{display:inline-block;background:var(--accent);color:#fff;padding:1px 8px;border-radius:3px;font-size:10px;margin-left:8px;vertical-align:middle;}
+.modal-section-label span.extra{background:#9e6c00;}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--nav);color:#fff;padding:13px 20px;border-radius:5px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:9px;transform:translateY(80px);opacity:0;transition:all .25s;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.22);border-left:4px solid var(--success);}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.error{border-left-color:var(--danger);}
+.toast i{font-size:14px;color:var(--success);}
+.toast.error i{color:var(--danger);}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .22s;}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal{background:#fff;border-radius:7px;width:700px;max-width:96vw;max-height:90vh;overflow-y:auto;transform:translateY(16px);transition:transform .22s;box-shadow:0 8px 40px rgba(0,0,0,.2);}
+.modal-overlay.open .modal{transform:translateY(0);}
+.modal-header{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:#fafafa;position:sticky;top:0;z-index:10;}
+.modal-header h3{font-size:16px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px;}
+.modal-header h3 i{color:var(--accent-dk);}
+.modal-close{background:none;border:none;color:var(--text-mute);cursor:pointer;font-size:16px;padding:2px 6px;border-radius:3px;transition:all .15s;}
+.modal-close:hover{background:var(--bg);color:var(--text);}
+.modal-body{padding:22px;}
+.modal-footer{padding:14px 22px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:9px;background:#fafafa;position:sticky;bottom:0;}
+.btn-cancel{padding:8px 16px;background:transparent;border:1px solid var(--border);color:var(--text-mid);border-radius:4px;cursor:pointer;font-family:'Roboto',sans-serif;font-size:13px;transition:all .15s;}
+.btn-cancel:hover{border-color:var(--border-dk);color:var(--text);}
+.btn-confirm{padding:8px 20px;background:var(--nav);border:none;color:#fff;border-radius:4px;cursor:pointer;font-family:'Roboto',sans-serif;font-size:13px;font-weight:600;transition:all .15s;display:inline-flex;align-items:center;gap:7px;}
+.btn-confirm i{font-size:12px;}
+.btn-confirm:hover{background:#1a1a1a;}
+
+/* ── EXPORT ── */
+.export-steps{background:#fafafa;border:1px solid var(--border);border-radius:6px;padding:18px 20px;margin-bottom:18px;}
+.export-steps p{color:var(--text-mid);font-size:13px;line-height:1.9;}
+.export-steps code{background:#e8e8e8;padding:1px 6px;border-radius:3px;font-size:12px;color:var(--text);}
+.export-steps strong{color:var(--text);}
+.copy-btn{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;background:var(--nav);border:none;color:#fff;border-radius:4px;cursor:pointer;font-size:12px;font-family:'Roboto',sans-serif;font-weight:500;transition:all .18s;}
+.copy-btn:hover{background:#1a1a1a;}
+.snippet-area{width:100%;height:260px;background:#1e1e1e;border:1px solid #333;border-radius:5px;padding:14px;color:#9cdcfe;font-size:12px;font-family:'Courier New',monospace;resize:vertical;outline:none;margin-top:14px;}
+.snippet-tabs{display:flex;gap:8px;margin-bottom:10px;}
+.snippet-tab{padding:6px 14px;background:#e8e8e8;border:1px solid var(--border);border-radius:4px;cursor:pointer;font-size:12px;font-weight:500;transition:all .15s;}
+.snippet-tab.active{background:var(--nav);color:#fff;border-color:var(--nav);}
+
+/* ── IMAGE UPLOADER ── */
+.img-upload-wrap{position:relative;}
+.img-upload-box{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+  border:2px dashed var(--border-dk);border-radius:6px;padding:18px 14px;
+  background:var(--bg-input);cursor:pointer;transition:all .18s;text-align:center;
+  min-height:90px;
+}
+.img-upload-box:hover{border-color:var(--accent);background:#f5f7f7;}
+.img-upload-box.has-img{border-style:solid;border-color:var(--accent);padding:8px;}
+.img-upload-box i{font-size:22px;color:var(--border-dk);}
+.img-upload-box:hover i{color:var(--accent-dk);}
+.img-upload-box p{font-size:12px;color:var(--text-mute);margin:0;line-height:1.4;}
+.img-upload-box strong{font-size:12px;color:var(--accent-dk);}
+.img-upload-box input[type="file"]{display:none;}
+.img-preview-thumb{
+  max-width:100%;max-height:100px;object-fit:cover;
+  border-radius:4px;display:block;
+}
+.img-upload-meta{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-top:6px;padding:5px 8px;background:#f0f3f3;border-radius:4px;
+  font-size:11px;color:var(--text-mid);
+}
+.img-upload-meta span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;}
+.img-clear-btn{
+  background:none;border:none;color:var(--danger);cursor:pointer;
+  font-size:12px;padding:2px 4px;border-radius:3px;flex-shrink:0;
+  display:flex;align-items:center;gap:4px;font-family:'Roboto',sans-serif;
+}
+.img-clear-btn:hover{background:var(--danger-lt);}
+
+/* ── MULTI-IMAGE SLOT GRID ── */
+.proj-img-slot {
+  border: 2px dashed var(--border-dk);
+  border-radius: 6px;
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: var(--bg-input);
+  position: relative;
+  overflow: hidden;
+  transition: border-color .18s, background .18s;
+  font-size: 11px;
+  color: var(--text-mute);
+  text-align: center;
+  gap: 4px;
+}
+.proj-img-slot:hover { border-color: var(--accent); background: #f5f7f7; }
+.proj-img-slot.has-img { border-style: solid; border-color: var(--accent); padding: 0; }
+.proj-img-slot i { font-size: 20px; color: var(--border-dk); }
+.proj-img-slot:hover i { color: var(--accent-dk); }
+.proj-img-slot img {
+  width: 100%; height: 100%;
+  object-fit: cover; display: block;
+  border-radius: 4px; cursor: zoom-in;
+}
+.proj-img-slot .slot-rm {
+  position: absolute; top: 3px; right: 3px;
+  background: rgba(0,0,0,.55); border: none; color: #fff;
+  font-size: 11px; border-radius: 3px; padding: 2px 5px;
+  cursor: pointer; display: none; line-height: 1.4;
+}
+.proj-img-slot.has-img .slot-rm { display: block; }
+.proj-img-slot .slot-num {
+  position: absolute; bottom: 3px; left: 5px;
+  font-size: 10px; color: rgba(255,255,255,.8);
+  background: rgba(0,0,0,.45); border-radius: 2px; padding: 1px 4px;
+}
+
+/* ── DRAG & DROP PROJECT ROWS ── */
+.drag-handle {
+  cursor: grab;
+  color: var(--border-dk);
+  font-size: 15px;
+  padding: 4px 6px;
+  border-radius: 3px;
+  user-select: none;
+  display: inline-block;
+  line-height: 1;
+  transition: color .15s, background .15s;
+}
+.drag-handle:active { cursor: grabbing; }
+.drag-handle:hover  { color: var(--accent-dk); background: var(--bg); }
+
+/* row being dragged */
+tr.dragging-row {
+  opacity: 0.38;
+  background: #f0f5f5 !important;
+}
+/* row acting as drop target */
+tr.drag-over-top td    { border-top: 2px solid var(--accent) !important; }
+tr.drag-over-bottom td { border-bottom: 2px solid var(--accent) !important; }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:#f0f0f0;}
+::-webkit-scrollbar-thumb{background:#ccc;border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:#aaa;}
+
+@media(max-width:860px){
+  .stats-row{grid-template-columns:1fr 1fr;}
+  .form-row,.form-row.three{grid-template-columns:1fr;}
+  .sidebar{transform:translateX(-100%);}
+  .main{margin-left:0;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ══ SIDEBAR ══ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <h1>Tajwar <span>//</span> Admin</h1>
+    <p>Portfolio CMS</p>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Dashboard</div>
+    <div class="nav-item active" onclick="switchPanel('overview',this)">
+      <i class="fa-solid fa-gauge-high"></i> Overview
+    </div>
+    <div class="nav-section-label">Content</div>
+    <div class="nav-item" onclick="switchPanel('hero',this)">
+      <i class="fa-solid fa-circle-play"></i> Hero / Intro
+    </div>
+    <div class="nav-item" onclick="switchPanel('about',this)">
+      <i class="fa-solid fa-user"></i> About Boxes
+    </div>
+    <div class="nav-item" onclick="switchPanel('skills',this)">
+      <i class="fa-solid fa-chart-bar"></i> Skills
+    </div>
+    <div class="nav-item" onclick="switchPanel('experience',this)">
+      <i class="fa-solid fa-briefcase"></i> Experience &amp; Education
+    </div>
+    <div class="nav-item" onclick="switchPanel('projects',this)">
+      <i class="fa-solid fa-folder-open"></i> Projects
+      <span class="nav-badge" id="proj-count">12</span>
+    </div>
+    <div class="nav-item" onclick="switchPanel('services',this)">
+      <i class="fa-solid fa-gears"></i> Services
+    </div>
+    <div class="nav-item" onclick="switchPanel('certifications',this)">
+      <i class="fa-solid fa-certificate"></i> Certifications
+      <span class="nav-badge" id="cert-count">0</span>
+    </div>
+    <div class="nav-item" onclick="switchPanel('funfacts',this)">
+      <i class="fa-solid fa-star"></i> Fun Facts
+    </div>
+    <div class="nav-item" onclick="switchPanel('contact',this)">
+      <i class="fa-solid fa-envelope"></i> Contact / Social
+    </div>
+    <div class="nav-section-label">Export</div>
+    <div class="nav-item" onclick="switchPanel('export',this)">
+      <i class="fa-solid fa-code"></i> Generate HTML
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <span class="status-dot"></span> Changes saved locally
+  </div>
+</aside>
+
+<!-- ══ MAIN ══ -->
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-title">Portfolio <span>Admin Dashboard</span></div>
+    <div class="topbar-actions">
+      <a href="https://mdtajwaralirumman.github.io/Tajwar-s-Portfolio-Website/index.html" target="_blank" class="btn-preview">
+        <i class="fa-solid fa-arrow-up-right-from-square"></i> index.html
+      </a>
+      <a href="https://mdtajwaralirumman.github.io/Tajwar-s-Portfolio-Website/projects.html" target="_blank" class="btn-preview">
+        <i class="fa-solid fa-arrow-up-right-from-square"></i> projects.html
+      </a>
+      <button class="btn-save" onclick="saveAll()">
+        <i class="fa-solid fa-floppy-disk"></i> Save All
+      </button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ══ OVERVIEW ══ -->
+    <div class="panel active" id="panel-overview">
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Total Projects</div>
+          <div class="stat-value" id="ov-projects">12</div>
+          <div class="accent-bar"></div>
+          <div class="stat-sub">Across 5 categories</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Skills Listed</div>
+          <div class="stat-value" id="ov-skills">14</div>
+          <div class="accent-bar"></div>
+          <div class="stat-sub">SQA &amp; Web</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Work Experiences</div>
+          <div class="stat-value" id="ov-exp">2</div>
+          <div class="accent-bar"></div>
+          <div class="stat-sub">+ 3 courses</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Education</div>
+          <div class="stat-value" id="ov-edu">3</div>
+          <div class="accent-bar"></div>
+          <div class="stat-sub">BSc + HSC + SSC</div>
+        </div>
+      </div>
+      <div class="section-card">
+        <div class="section-header">
+          <h3><i class="fa-solid fa-list-check"></i> Section Overview</h3>
+        </div>
+        <div class="section-body" style="padding:0">
+          <table class="data-table">
+            <thead><tr><th>Section</th><th>Items</th><th>Pages Affected</th><th>Action</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><i class="fa-solid fa-circle-play" style="color:var(--accent-dk);margin-right:7px"></i>Hero Carousel</td>
+                <td><span class="badge badge-automation">3 slides</span></td>
+                <td style="color:var(--text-mute);font-size:12px">index.html</td>
+                <td><button class="btn-icon" onclick="switchPanelById('hero')"><i class="fa-solid fa-pen"></i> Edit</button></td>
+              </tr>
+              <tr>
+                <td><i class="fa-solid fa-user" style="color:var(--accent-dk);margin-right:7px"></i>About Info Boxes</td>
+                <td><span class="badge badge-testcase">4 boxes</span></td>
+                <td style="color:var(--text-mute);font-size:12px">index.html</td>
+                <td><button class="btn-icon" onclick="switchPanelById('about')"><i class="fa-solid fa-pen"></i> Edit</button></td>
+              </tr>
+              <tr>
+                <td><i class="fa-solid fa-chart-bar" style="color:var(--accent-dk);margin-right:7px"></i>Skills &amp; Progress</td>
+                <td><span class="badge badge-web">14 skills</span></td>
+                <td style="color:var(--text-mute);font-size:12px">index.html</td>
+                <td><button class="btn-icon" onclick="switchPanelById('skills')"><i class="fa-solid fa-pen"></i> Edit</button></td>
+              </tr>
+              <tr>
+                <td><i class="fa-solid fa-folder-open" style="color:var(--accent-dk);margin-right:7px"></i>Projects Portfolio</td>
+                <td><span class="badge badge-ml" id="ov-proj-badge">12 projects</span></td>
+                <td style="color:var(--text-mute);font-size:12px"><strong>index.html</strong> + <strong>projects.html</strong></td>
+                <td><button class="btn-icon" onclick="switchPanelById('projects')"><i class="fa-solid fa-pen"></i> Edit</button></td>
+              </tr>
+              <tr>
+                <td><i class="fa-solid fa-gears" style="color:var(--accent-dk);margin-right:7px"></i>Services</td>
+                <td><span class="badge badge-iot">4 services</span></td>
+                <td style="color:var(--text-mute);font-size:12px">index.html</td>
+                <td><button class="btn-icon" onclick="switchPanelById('services')"><i class="fa-solid fa-pen"></i> Edit</button></td>
+              </tr>
+              <tr>
+                <td><i class="fa-solid fa-certificate" style="color:var(--accent-dk);margin-right:7px"></i>Certifications</td>
+                <td><span class="badge badge-testcase" id="ov-cert-badge">0 images</span></td>
+                <td style="color:var(--text-mute);font-size:12px">index.html</td>
+                <td><button class="btn-icon" onclick="switchPanelById('certifications')"><i class="fa-solid fa-pen"></i> Edit</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ HERO ══ -->
+    <div class="panel" id="panel-hero">
+      <div class="section-card">
+        <div class="section-header"><h3><i class="fa-solid fa-id-card"></i> CTA &amp; Bio</h3></div>
+        <div class="section-body">
+          <div class="form-row">
+            <div class="form-group"><label>CTA Heading</label><input type="text" id="cta-heading" value="Hi there! I am Tajwar."></div>
+            <div class="form-group"><label>Role / Tagline</label><input type="text" id="cta-subtitle" value="SQA Engineer | Web Designer"></div>
+          </div>
+          <div class="form-row single">
+            <div class="form-group"><label>Bio Paragraph</label><textarea id="cta-bio" rows="3">As a Software Engineer, I'm looking for possibilities to use my abilities and support an organization's success. If we have similar interests or would want to exchange ideas, kindly let me know. Having a conversation with you excites me! 🤝</textarea></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Resume Link URL</label><input type="text" id="resume-link" value="#" placeholder="https://drive.google.com/..."></div>
+            <div class="form-group"><label>About Section Subtitle</label><input type="text" id="about-subtitle" value="little information"></div>
+          </div>
+        </div>
+      </div>
+      <div class="section-card">
+        <div class="section-header">
+          <h3><i class="fa-solid fa-film"></i> Carousel Slides</h3>
+          <button class="btn-add" onclick="addCarouselSlide()"><i class="fa-solid fa-plus"></i> Add Slide</button>
+        </div>
+        <div class="section-body" id="carousel-slides"></div>
+      </div>
+    </div>
+
+    <!-- ══ ABOUT ══ -->
+    <div class="panel" id="panel-about">
+      <div class="section-card">
+        <div class="section-header">
+          <h3><i class="fa-solid fa-rotate"></i> Rotating Info Boxes</h3>
+          <button class="btn-add" onclick="addAboutBox()"><i class="fa-solid fa-plus"></i> Add Box</button>
+        </div>
+        <div class="section-body" id="about-boxes"></div>
+      </div>
+    </div>
+
+    <!-- ══ SKILLS ══ -->
+    <div class="panel" id="panel-skills">
+      <div class="section-card">
+        <div class="section-header">
+          <h3><i class="fa-solid fa-chart-bar"></i> Skills &amp; Progress Bars</h3>
+          <button class="btn-add" onclick="addSkill()"><i class="fa-solid fa-plus"></i> Add Skill</button>
+        </div>
+        <div class="section-body">
+          <div class="form-row" style="margin-bottom:18px">
+            <div class="form-group"><label>Section Heading</label><input type="text" id="skills-heading" value="My skills"></div>
+            <div class="form-group"><label>Section Subtitle</label><input type="text" id="skills-subtitle" value="SQA || Testing"></div>
+          </div>
+          <div id="skills-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ EXPERIENCE ══ -->
+    <div class="panel" id="panel-experience">
+      <div class="section-card">
+        <div class="section-header">
+          <h3><i class="fa-solid fa-briefcase"></i> Work History</h3>
+          <button class="btn-add" onclick="addTimelineItem('work-timeline','blue')"><i class="fa-solid fa-plus"></i> Add Job</button>
+        </div>
+        <div class="section-body" id="work-timeline"></div>
+      </div>
+      <div class="section-card">
+        <div class="section-header">
+          <h3><i class="fa-solid fa-certificate"></i> Courses Completed</h3>
+          <button class="btn-add" onclick="addTimelineItem('course-timeline','green')"><i class="fa-solid fa-plus"></i> Add Course</button>
+        </div>
+        <div class="section-body" id="course-timeline"></div>
+      </div>
+      <div class="section-card">
+        <div class="section-header">
+          <h3><i class="fa-solid fa-graduation-cap"></i> Education</h3>
+          <button class="btn-add" onclick="addTimelineItem('edu-timeline','purple')"><i class="fa-solid fa-plus"></i> Add Education</button>
+        </div>
+        <div class="section-body" id="edu-timeline"></div>
+      </div>
+    </div>
+
+    <!-- ══ PROJECTS ══ -->
+    <div class="panel" id="panel-projects">
+      <div class="section-card">
+        <div class="section-header">
+          <h3><i class="fa-solid fa-folder-open"></i> Projects — Full Editor</h3>
+          <button class="btn-add" onclick="openProjectModal()"><i class="fa-solid fa-plus"></i> Add Project</button>
+        </div>
+        <div class="section-body" style="padding:12px 20px 0">
+          <!-- Field Map Legend -->
+          <div class="fields-info">
+            <strong><i class="fa-solid fa-map" style="margin-right:6px"></i>Field → Page Mapping</strong>
+            Fields marked <span class="field-tag">index.html</span> appear in the portfolio grid on the main page.
+            Fields marked <span class="field-tag extra">projects.html</span> appear in the accordion detail panel on the projects page.
+            Fields marked with both appear on both pages.
+          </div>
+        </div>
+        <div class="section-body" style="padding:0 20px 20px">
+          <p style="font-size:12px;color:var(--text-mute);margin-bottom:10px">
+            <i class="fa-solid fa-grip-lines" style="margin-right:5px"></i>
+            Drag the <strong>≡</strong> handle on any row to reorder projects. Order is reflected on both pages when you export.
+          </p>
+          <table class="data-table" id="projects-table">
+            <thead>
+              <tr>
+                <th style="width:28px"></th>
+                <th style="width:30%">Project Name</th>
+                <th>Category</th>
+                <th>Role</th>
+                <th>Tools</th>
+                <th style="width:120px">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="projects-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ SERVICES ══ -->
+    <div class="panel" id="panel-services">
+      <div class="section-card">
+        <div class="section-header">
+          <h3><i class="fa-solid fa-gears"></i> Services Offered</h3>
+          <button class="btn-add" onclick="addService()"><i class="fa-solid fa-plus"></i> Add Service</button>
+        </div>
+        <div class="section-body" id="services-list"></div>
+      </div>
+    </div>
+
+    <!-- ══ CERTIFICATIONS ══ -->
+    <div class="panel" id="panel-certifications">
+      <div class="section-card">
+        <div class="section-header">
+          <h3><i class="fa-solid fa-certificate"></i> Certification Images</h3>
+        </div>
+        <div class="section-body">
+          <p style="font-size:12px;color:var(--text-mute);margin-bottom:14px">
+            <i class="fa-solid fa-circle-info" style="margin-right:5px"></i>
+            Upload up to 10 certificate images. They appear as an auto-rotating slider (changes every 6 seconds) in the "Certifications" section on index.html. Visitors can click any image to view it enlarged. Drag any slot's image to reorder it.
+          </p>
+          <div id="cert-imgs-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px"></div>
+          <p class="form-hint" style="margin-top:10px">Recommended: clear, well-lit photos or scans of your certificates (PNG or JPG). At least 5 images recommended for a smooth slider experience.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ FUN FACTS ══ -->
+    <div class="panel" id="panel-funfacts">
+      <div class="section-card">
+        <div class="section-header">
+          <h3><i class="fa-solid fa-star"></i> Fun Facts / Stats</h3>
+          <button class="btn-add" onclick="addFunFact()"><i class="fa-solid fa-plus"></i> Add Fact</button>
+        </div>
+        <div class="section-body"><div class="funfact-row" id="funfacts-list"></div></div>
+      </div>
+    </div>
+
+    <!-- ══ CONTACT ══ -->
+    <div class="panel" id="panel-contact">
+      <div class="section-card">
+        <div class="section-header"><h3><i class="fa-solid fa-location-dot"></i> Contact Information</h3></div>
+        <div class="section-body">
+          <div class="form-row three">
+            <div class="form-group"><label>Address</label><input type="text" id="contact-address" value="Mirpur-2, Middle Monipur, Dhaka-1216"></div>
+            <div class="form-group"><label>Phone</label><input type="text" id="contact-phone" value="+880 1933954158"></div>
+            <div class="form-group"><label>Primary Email</label><input type="email" id="contact-email1" value="mdtajwarali@gmail.com"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Secondary Email</label><input type="email" id="contact-email2" value="tajwaralirumman@gmail.com"></div>
+            <div class="form-group"><label>WhatsApp Number</label><input type="text" id="contact-wa" value="+880 1933954158"></div>
+          </div>
+        </div>
+      </div>
+      <div class="section-card">
+        <div class="section-header"><h3><i class="fa-solid fa-share-nodes"></i> Social Links</h3></div>
+        <div class="section-body" id="social-links">
+          <div class="social-item"><div class="icon-col"><i class="fa-brands fa-linkedin" style="color:#0a66c2"></i></div><input type="text" value="https://www.linkedin.com/in/mdtajwar-ali" placeholder="LinkedIn URL"></div>
+          <div class="social-item"><div class="icon-col"><i class="fa-brands fa-github"></i></div><input type="text" value="https://github.com/MdTajwarAliRumman" placeholder="GitHub URL"></div>
+          <div class="social-item"><div class="icon-col"><i class="fa-brands fa-facebook" style="color:#1877f2"></i></div><input type="text" value="https://www.facebook.com/1rumman" placeholder="Facebook URL"></div>
+          <div class="social-item"><div class="icon-col"><i class="fa-brands fa-instagram" style="color:#e1306c"></i></div><input type="text" value="https://www.instagram.com/_____tajwar_____/" placeholder="Instagram URL"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ EXPORT ══ -->
+    <div class="panel" id="panel-export">
+      <div class="section-card">
+        <div class="section-header"><h3><i class="fa-solid fa-code"></i> Generate &amp; Export HTML</h3></div>
+        <div class="section-body">
+          <div class="export-steps">
+            <p>
+              <strong>How to push your edits to GitHub Pages:</strong><br>
+              1. Fill in your sections and click <strong>Save All</strong> — data is stored in <code>localStorage</code>.<br>
+              2. Choose which file you want to update below, then click <strong>Generate Script</strong>.<br>
+              3. Paste the script just before <code>&lt;/body&gt;</code> in the corresponding file on GitHub.<br>
+              4. Commit &amp; push — GitHub Pages rebuilds automatically.<br>
+              <br>
+              <strong>Note:</strong> The <strong>index.html script</strong> injects the portfolio grid + carousel + fun facts.<br>
+              The <strong>projects.html script</strong> injects the accordion panels with full project details.
+            </p>
+          </div>
+          <div class="snippet-tabs">
+            <div class="snippet-tab active" id="tab-index" onclick="setTab('index')">
+              <i class="fa-solid fa-file-code"></i> index.html Script
+            </div>
+            <div class="snippet-tab" id="tab-projects" onclick="setTab('projects')">
+              <i class="fa-solid fa-file-code"></i> projects.html Script
+            </div>
+          </div>
+          <button class="copy-btn" onclick="generateSnippet()">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Script
+          </button>
+          <div id="snippet-output" style="display:none">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:16px;margin-bottom:4px">
+              <span style="font-size:12px;color:var(--text-mute);font-weight:500" id="snippet-label">Generated script — paste before &lt;/body&gt; in index.html</span>
+              <button class="copy-btn" onclick="copySnippet()" style="padding:6px 12px;font-size:11px"><i class="fa-solid fa-copy"></i> Copy</button>
+            </div>
+            <textarea class="snippet-area" id="snippet-text" readonly></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</main>
+</div>
+
+<!-- ══ PROJECT MODAL ══ -->
+<div class="modal-overlay" id="project-modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h3><i class="fa-solid fa-folder-plus"></i> <span id="modal-title">Add New Project</span></h3>
+      <button class="modal-close" onclick="closeProjectModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+
+      <!-- ── SHARED FIELDS ── -->
+      <div class="modal-section-label first">
+        Shared Fields
+        <span>index.html</span>
+        <span class="extra">projects.html</span>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Project Name / Title</label>
+          <input type="text" id="m-name" placeholder="e.g. My TaxBreaker – FinTech QA">
+        </div>
+        <div class="form-group">
+          <label>Category <span style="font-size:10px;color:var(--text-mute)">(filter class)</span></label>
+          <select id="m-category">
+            <option value="automation">Automation Testing</option>
+            <option value="testcase">Manual / Test Cases</option>
+            <option value="webDesign">Websites</option>
+            <option value="ML">Machine Learning</option>
+            <option value="iot">IOT Based</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row single">
+        <div class="form-group">
+          <label>Short Description <span class="field-tag">index.html</span></label>
+          <textarea id="m-desc" rows="2" placeholder="Brief 1–2 sentence overview shown in the portfolio grid..."></textarea>
+          <span class="form-hint">Shown in the hover card on index.html</span>
+        </div>
+      </div>
+      <div class="form-row single">
+        <div class="form-group">
+          <label>Thumbnail Image <span class="field-tag">index.html</span></label>
+          <div class="img-upload-wrap">
+            <div class="img-upload-box" id="thumb-upload-box" onclick="document.getElementById('m-img-file').click()">
+              <i class="fa-solid fa-image"></i>
+              <p><strong>Click to upload</strong> or drag &amp; drop</p>
+              <p>PNG, JPG, WEBP — small card image shown in the portfolio grid</p>
+              <input type="file" id="m-img-file" accept="image/*" onchange="handleImgUpload(this,'m-img','thumb-upload-box','thumb-meta','thumb-name')">
+            </div>
+            <div class="img-upload-meta" id="thumb-meta" style="display:none">
+              <span id="thumb-name">No file chosen</span>
+              <button class="img-clear-btn" type="button" onclick="clearImg('m-img','thumb-upload-box','thumb-meta','m-img-file')">
+                <i class="fa-solid fa-xmark"></i> Remove
+              </button>
+            </div>
+          </div>
+          <!-- hidden: stores base64 data URL used in the export script -->
+          <input type="hidden" id="m-img">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Tools Used <span class="field-tag">index.html</span> <span class="field-tag extra">projects.html</span></label>
+          <input type="text" id="m-tools" placeholder="e.g. Playwright, Selenium, Postman">
+        </div>
+        <div class="form-group">
+          <label>GitHub Link <span class="field-tag">index.html</span> <span class="field-tag extra">projects.html</span></label>
+          <input type="text" id="m-link" placeholder="https://github.com/...">
+        </div>
+      </div>
+
+      <!-- ── PROJECTS.HTML ONLY FIELDS ── -->
+      <div class="modal-section-label">
+        Detailed Fields
+        <span class="extra">projects.html accordion only</span>
+      </div>
+      <div class="form-row single">
+        <div class="form-group">
+          <label>Full Project Overview</label>
+          <textarea id="m-overview" rows="3" placeholder="A longer description of the project shown in the accordion expand panel on projects.html..."></textarea>
+          <span class="form-hint">Shown as the paragraph under "Project Overview" heading in projects.html</span>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Role</label>
+          <input type="text" id="m-role" placeholder="e.g. SQA Engineer, QA Tester">
+          <span class="form-hint">Shown as <strong>Role:</strong> in meta list</span>
+        </div>
+        <div class="form-group">
+          <label>Test Types / Methods</label>
+          <input type="text" id="m-testtypes" placeholder="e.g. Manual, Regression, Smoke, API">
+          <span class="form-hint">Shown as <strong>Test Types:</strong> in meta list</span>
+        </div>
+      </div>
+      <div class="form-row single">
+        <div class="form-group">
+          <label>Responsibilities <span class="field-tag extra">projects.html</span></label>
+          <textarea id="m-responsibilities" rows="4" placeholder="One responsibility per line, e.g.&#10;Wrote and executed 80+ manual test cases&#10;Reported and tracked defects in Jira&#10;Collaborated with developers on bug fixes"></textarea>
+          <span class="form-hint">Each line becomes a bullet point under "Responsibilities" in the projects.html accordion</span>
+        </div>
+      </div>
+      <!-- ── MULTI-IMAGE UPLOAD (up to 5 images → slider on projects.html) ── -->
+      <div class="form-row single">
+        <div class="form-group">
+          <label>
+            Project Images — slider on accordion
+            <span class="field-tag extra">projects.html</span>
+            <span style="font-size:11px;color:var(--text-mute);font-weight:400;margin-left:6px">Up to 5 · click image to zoom in viewer</span>
+          </label>
+          <div id="proj-imgs-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:6px"></div>
+          <span class="form-hint">Images appear as a slider. Click any image in the preview to enlarge it. At least 1 required.</span>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Button 1 Label</label>
+          <input type="text" id="m-btn1label" placeholder="e.g. View Project, Live View">
+        </div>
+        <div class="form-group">
+          <label>Button 1 URL</label>
+          <input type="text" id="m-btn1url" placeholder="https://...">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Button 2 Label</label>
+          <input type="text" id="m-btn2label" placeholder="e.g. Test Cases, Test Report">
+        </div>
+        <div class="form-group">
+          <label>Button 2 URL</label>
+          <input type="text" id="m-btn2url" placeholder="https://...">
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeProjectModal()">Cancel</button>
+      <button class="btn-confirm" onclick="saveProject()"><i class="fa-solid fa-check"></i> Save Project</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TOAST ══ -->
+<div class="toast" id="toast">
+  <i class="fa-solid fa-circle-check" id="toast-icon"></i>
+  <span id="toast-msg">Saved successfully!</span>
+</div>
+
+<script>
+/* ════════════════════════════════════
+   DATA STORE
+════════════════════════════════════ */
+const DATA = {
+  carousel: [
+    { h1:"Hello There Explorer!", p:"Let's make the web beautiful together" },
+    { h1:"I'm Md. Tajwar Ali",    p:"Observant | Diligent | Socializer" },
+    { h1:"A Determined",          p:"SQA Engineer | Web Designer" }
+  ],
+  aboutBoxes: [
+    { icon:"fa-solid fa-user",    title:"About Me",       desc:"I'm Md. Tajwar Ali, a graduate with a Bachelor of Science in Computer Science & Engineering (BSc in CSE)." },
+    { icon:"fa-solid fa-diamond", title:"What I Do?",     desc:"I am continuously enhancing my expertise in Software Quality Assurance, focusing on both manual and automation testing." },
+    { icon:"fa-solid fa-heart",   title:"Why I Do It?",   desc:"Willing to acquire practical experience in test design and execution. SQA engineers play a critical role in the SDLC." },
+    { icon:"fa-solid fa-rocket",  title:"What I intend?", desc:"As an SQA engineer, my goal is to ensure software quality by identifying defects early and collaborating with teams." }
+  ],
+  skills: [
+    { name:"Manual Testing", pct:95 },{ name:"Automation Testing", pct:70 },
+    { name:"Test Case Writing", pct:97 },{ name:"Selenium", pct:60 },
+    { name:"Api Testing", pct:90 },{ name:"Playwright", pct:60 },
+    { name:"Performance Testing", pct:68 },{ name:"Regression Testing", pct:78 },
+    { name:"Smoke & Sanity Testing", pct:88 },{ name:"Static Testing", pct:78 },
+    { name:"Concepts: SDLC, STLC, OOP", pct:80 },{ name:"Programming: Java", pct:50 },
+    { name:"Requirement Analysis", pct:90 },{ name:"Other Skills: HTML, CSS, JS", pct:70 }
+  ],
+  workHistory: [
+    { period:"May 2025 – Present",     title:"SQA Engineer",               company:"Softvence IT Ltd. a Betopia Company", desc:"Performing manual testing on diverse projects including mobile apps and websites, conducting functional, API, performance, UI, and UAT testing.", color:"blue" },
+    { period:"July 2024 – April 2025", title:"Technical Business Analyst",  company:"Divine IT Limited",                  desc:"Developed test cases and followed testing methodologies, ensured quality of software and technical documentation, and collaborated with developers and SQA team.", color:"blue" }
+  ],
+  courses: [
+    { period:"Feb 2025 – May 2025", title:"Full Stack SDET & SQA Course",         company:"Road to SDET",   desc:"Manual & Automation Testing, Requirement Analysis, API Testing, Playwright.", color:"green" },
+    { period:"May 2024 – Dec 2024", title:"Hands-on SQA & Cyber Security Course", company:"IT Training BD", desc:"Manual & Automation Testing, SQA methodologies, Selenium, Junit, Cucumber, Appium.", color:"green" },
+    { period:"Oct 2023 – Mar 2024", title:"Full Stack Web Development",            company:"Shikhbe Shobai", desc:"HTML, CSS, JavaScript, React, Bootstrap, Django.", color:"green" }
+  ],
+  education: [
+    { period:"2020 – 2024", title:"B.Sc. in Computer Science & Engineering", company:"Bangladesh University of Business & Technology (BUBT)", desc:"CGPA: 3.47 / 4.00", color:"purple" },
+    { period:"2017 – 2019", title:"HSC – Science",                           company:"Shaheed Police Smirty College, Dhaka",                  desc:"GPA: 4.24 / 5.00",  color:"purple" },
+    { period:"2007 – 2017", title:"SSC – Science",                           company:"Monipur High School, Dhaka",                            desc:"GPA: 4.91 / 5.00",  color:"purple" }
+  ],
+  /* ── UNIFIED PROJECT SCHEMA ──
+     index.html uses:  name, category, desc, img, tools, link
+     projects.html uses: name, overview, role, testTypes, tools, projImg, link, btn1label, btn1url, btn2label, btn2url
+  */
+  projects: [
+    { name:"Project: Mirko (My TaxBreaker)",  category:"automation", desc:"Centralizes all project resources including SRS, Figma designs, API/UI testing reports, and the end-to-end web automation suite.", img:"img/portfolio/mirko.png",    tools:"Playwright",       link:"https://github.com/MdTajwarAliRumman/Project-Mirko-All-Documentation",                                                          overview:"A large-scale FinTech application for a Portuguese client. Responsible for manual testing, documentation, and quality validation.", role:"SQA Engineer",     testTypes:"Manual, Regression, Smoke, API", projImg:"img/projects/taxbreaker.jpg", btn1label:"View Project", btn1url:"https://github.com/MdTajwarAliRumman/Project-Mirko-All-Documentation",                                               btn2label:"Test Cases", btn2url:"#" },
+    { name:"Project: Wafilife",               category:"automation", desc:"Conducted manual and automated testing across multiple modules and endpoints to ensure system stability.",                        img:"img/portfolio/wafilife.png",  tools:"Selenium",         link:"https://github.com/MdTajwarAliRumman/WebAutomation-Testing-on-WafiLife-WebApp-Using-Selenium",                                   overview:"Conducted manual and automated testing across multiple modules and endpoints to ensure system stability.",                          role:"QA Tester",        testTypes:"Manual, Automation, API",        projImg:"img/portfolio/wafilife.png",  btn1label:"View Project", btn1url:"https://github.com/MdTajwarAliRumman/WebAutomation-Testing-on-WafiLife-WebApp-Using-Selenium",                      btn2label:"Test Report", btn2url:"#" },
+    { name:"Project: Match Mind",             category:"testcase",   desc:"A comprehensive mobile application to track, analyze, and engage with football matches in real time.",                          img:"img/portfolio/matchmind.png", tools:"Postman & Newman", link:"https://github.com/MdTajwarAliRumman/API-Testing-on-Project-Samfidy-MatchMind-CLI",                                              overview:"API testing of a football match tracking mobile application. Comprehensive endpoint validation and performance testing.",            role:"QA Tester",        testTypes:"API, Functional, Performance",   projImg:"img/portfolio/matchmind.png",btn1label:"Live View",     btn1url:"https://github.com/MdTajwarAliRumman/API-Testing-on-Project-Samfidy-MatchMind-CLI",                                  btn2label:"Test Report", btn2url:"#" },
+    { name:"Test Case: Rokomari Website",     category:"testcase",   desc:"Tracking errors and defects on the Rokomari website, creating test cases, and reporting issues with Jira.",                    img:"img/portfolio/rokomari.png", tools:"Jira",             link:"https://github.com/MdTajwarAliRumman/Test-Cases/blob/master/Test%20Case_Rokomari/TestCase_Rokomari.xlsx",                           overview:"Comprehensive test case writing and defect tracking for the Rokomari e-commerce website.",                                          role:"QA Tester",        testTypes:"Manual, UI, Functional",         projImg:"img/portfolio/rokomari.png", btn1label:"View Project",  btn1url:"https://github.com/MdTajwarAliRumman/Test-Cases/blob/master/Test%20Case_Rokomari/TestCase_Rokomari.xlsx",            btn2label:"Test Cases",  btn2url:"https://github.com/MdTajwarAliRumman/Test-Cases/blob/master/Test%20Case_Rokomari/TestCase_Rokomari.xlsx" },
+    { name:"Test Case: Amazon Website",       category:"testcase",   desc:"Tracking errors and defects on the Amazon Shopping website, creating test cases, and reporting issues with Jira.",              img:"img/portfolio/amazon.jpg",   tools:"Jira",             link:"https://shorturl.at/DEjHB",                                                                                                            overview:"Test case documentation and bug reporting for the Amazon shopping platform.",                                                       role:"QA Tester",        testTypes:"Manual, Smoke, Regression",      projImg:"img/portfolio/amazon.jpg",   btn1label:"View Project",  btn1url:"https://shorturl.at/DEjHB",                                                                                           btn2label:"Test Cases",  btn2url:"https://shorturl.at/DEjHB" },
+    { name:"Automation Exercise (Playwright)",category:"automation", desc:"A Playwright automation framework template with reusable utilities and optimized methods for POM management.",                  img:"img/portfolio/opencart.jpg", tools:"Playwright",       link:"https://github.com/MdTajwarAliRumman/Playwright-Framework-Template",                                                                    overview:"A Playwright automation framework template with base and core code, reusable utilities, and optimized methods for POM management.", role:"Test Automation Engineer", testTypes:"Automation, E2E",         projImg:"img/portfolio/opencart.jpg", btn1label:"View Project",  btn1url:"https://github.com/MdTajwarAliRumman/Playwright-Framework-Template",                                                 btn2label:"Documentation",btn2url:"#" },
+    { name:"FireAlarm and GasDetector",       category:"iot",        desc:"IoT-based technology that detects gas leaks and sounds fire alarms in factory using Arduino, Firebase and IoT components.",    img:"img/portfolio/firealrm.jpg", tools:"Arduino, Firebase",link:"https://github.com/MdTajwarAliRumman/FireAlarm_and_GasDetector_System",                                                               overview:"An IoT-based technology that detects gas leaks and sounds fire alarms in factory using Arduino, Firebase and IoT components.",       role:"IoT Developer",    testTypes:"Hardware, Integration",          projImg:"img/portfolio/firealrm.jpg", btn1label:"View Project",  btn1url:"https://github.com/MdTajwarAliRumman/FireAlarm_and_GasDetector_System",                                              btn2label:"Documentation",btn2url:"#" },
+    { name:"Heart Disease Prediction",        category:"ML",         desc:"ML project providing accurate prediction of whether a person has heart disease using Logistic Regression.",                     img:"img/portfolio/heart.jpg",   tools:"Python, ML",       link:"https://github.com/MdTajwarAliRumman/Heart_Disease_prediction",                                                                        overview:"A machine learning project that provides accurate prediction of heart disease using Logistic Regression algorithm.",                 role:"ML Developer",     testTypes:"Model Validation, Unit Testing",  projImg:"img/portfolio/heart.jpg",   btn1label:"View Project",  btn1url:"https://github.com/MdTajwarAliRumman/Heart_Disease_prediction",                                                      btn2label:"Source Code",  btn2url:"https://github.com/MdTajwarAliRumman/Heart_Disease_prediction" },
+    { name:"Airline Ticket Management",       category:"webDesign",  desc:"Airline ticket management system in C#. Assists consumers in purchasing tickets and shows available flights.",                 img:"img/portfolio/plane.jpg",   tools:"C#",               link:"https://github.com/MdTajwarAliRumman/AirlineManagement",                                                                               overview:"Airline ticket management system built with C#. Assists consumers in purchasing tickets and shows flight availability.",             role:"Web Developer",    testTypes:"Functional, UI",                 projImg:"img/portfolio/plane.jpg",    btn1label:"Live View",     btn1url:"https://github.com/MdTajwarAliRumman/AirlineManagement",                                                             btn2label:"Source Code",  btn2url:"https://github.com/MdTajwarAliRumman/AirlineManagement" },
+    { name:"Food Delivery System",            category:"webDesign",  desc:"Food-showcasing website where customers can purchase food from the restaurant of their choice.",                               img:"img/portfolio/food22.jpg",  tools:"HTML, CSS, JS",    link:"https://github.com/MdTajwarAliRumman/Food_Delivery_System-FoodieVerse-",                                                                overview:"A food-showcasing website where customers can purchase food from the restaurant of their choice, built with HTML, CSS, and Bootstrap.",role:"Web Developer",   testTypes:"UI, Responsive, Cross-browser",  projImg:"img/portfolio/food22.jpg",   btn1label:"Live View",     btn1url:"https://github.com/MdTajwarAliRumman/Food_Delivery_System-FoodieVerse-",                                             btn2label:"Source Code",  btn2url:"https://github.com/MdTajwarAliRumman/Food_Delivery_System-FoodieVerse-" },
+    { name:"Online Gadget Store",             category:"webDesign",  desc:"Website featuring gadgets and equipment for online purchasing built with HTML, CSS, and Bootstrap.",                           img:"img/portfolio/gadget.jpg",  tools:"HTML, CSS, JS",    link:"#",                                                                                                                                    overview:"A website featuring a variety of gadgets and equipment for online purchasing.",                                                      role:"Web Developer",    testTypes:"UI, Responsive",                 projImg:"img/portfolio/gadget.jpg",   btn1label:"Live View",     btn1url:"#",                                                                                                                   btn2label:"Source Code",  btn2url:"#" },
+    { name:"Food Diet & Nutrition WebApp",    category:"ML",         desc:"Web application suggesting foods based on user's BMI with meal recommendations using an ML ensemble model.",                   img:"img/portfolio/diet.jpg",    tools:"HTML, JS, ML",     link:"https://github.com/MdTajwarAliRumman/Food-Diet-and-Nutrition-WebApp",                                                                   overview:"Web application that suggests foods based on user's BMI, indicating if underweight or overweight and providing meal recommendations.", role:"ML Developer",   testTypes:"Functional, ML Model Validation",projImg:"img/portfolio/diet.jpg",    btn1label:"Live View",     btn1url:"https://github.com/MdTajwarAliRumman/Food-Diet-and-Nutrition-WebApp",                                                btn2label:"Source Code",  btn2url:"https://github.com/MdTajwarAliRumman/Food-Diet-and-Nutrition-WebApp" }
+  ],
+  services: [
+    { icon:"fa-solid fa-vial",               title:"Manual Testing",    desc:"Manual testing involves hands-on verification of software functionality through test case execution, prioritizing user perspective over automated tools." },
+    { icon:"fa-solid fa-screwdriver-wrench", title:"Testing Tools",     desc:"With expertise in Jira, Postman, and Selenium, I manage projects, conduct comprehensive API testing and ensure web application quality." },
+    { icon:"fa-solid fa-code",               title:"Web Designing",     desc:"In web designing, I bring creativity and technical proficiency to create visually appealing and user-friendly websites using HTML, CSS, and JavaScript." },
+    { icon:"fa-solid fa-chart-line",         title:"Business Analysis", desc:"I specialize in translating business needs into functional requirements and solutions through thorough analysis and stakeholder management." }
+  ],
+  funfacts: [
+    { count:1200, label:"Number of hours worked" },
+    { count:20,   label:"Completed Projects" },
+    { count:555,  label:"Solved Rubik's cube" },
+    { count:1100, label:"Cups of Tea drinking" }
+  ],
+  /* ── CERTIFICATIONS: array of image data-URLs / paths, shown as a slider on index.html ── */
+  certifications: []
+};
+
+let editingProjectIdx = null;
+let activeSnippetTab = 'index';
+
+/* ════ NAVIGATION ════ */
+function switchPanel(id, el) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (el) el.classList.add('active');
+}
+function switchPanelById(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.getAttribute('onclick') && n.getAttribute('onclick').includes("'" + id + "'"))
+      n.classList.add('active');
+  });
+}
+
+/* ════ CAROUSEL ════ */
+function renderCarousel() {
+  const c = document.getElementById('carousel-slides');
+  c.innerHTML = '';
+  DATA.carousel.forEach((s, i) => {
+    const d = document.createElement('div');
+    d.className = 'carousel-item-ed';
+    d.innerHTML = `
+      <input type="text" class="small" value="${esc(s.h1)}" placeholder="Heading" oninput="DATA.carousel[${i}].h1=this.value">
+      <input type="text" value="${esc(s.p)}" placeholder="Subtitle" oninput="DATA.carousel[${i}].p=this.value">
+      <button class="btn-icon danger" onclick="removeCarouselSlide(${i})" title="Delete"><i class="fa-solid fa-trash"></i></button>`;
+    c.appendChild(d);
+  });
+}
+function addCarouselSlide() { DATA.carousel.push({ h1:"New Slide", p:"Subtitle" }); renderCarousel(); }
+function removeCarouselSlide(i) { DATA.carousel.splice(i,1); renderCarousel(); }
+
+/* ════ ABOUT BOXES ════ */
+function renderAboutBoxes() {
+  const c = document.getElementById('about-boxes');
+  c.innerHTML = '';
+  DATA.aboutBoxes.forEach((b, i) => {
+    const d = document.createElement('div');
+    d.className = 'timeline-editor-item';
+    d.innerHTML = `
+      <div class="item-header">
+        <div class="item-title"><i class="${b.icon}" style="margin-right:6px;color:var(--accent-dk)"></i>Box ${i+1}: ${esc(b.title)}</div>
+        <button class="btn-icon danger" onclick="removeAboutBox(${i})"><i class="fa-solid fa-trash"></i> Remove</button>
+      </div>
+      <div class="form-row three">
+        <div class="form-group"><label>FA Icon Class</label><input type="text" value="${esc(b.icon)}" placeholder="fa-solid fa-user" oninput="DATA.aboutBoxes[${i}].icon=this.value"></div>
+        <div class="form-group" style="grid-column:span 2"><label>Title</label><input type="text" value="${esc(b.title)}" oninput="DATA.aboutBoxes[${i}].title=this.value"></div>
+      </div>
+      <div class="form-group"><label>Description</label><textarea rows="2" oninput="DATA.aboutBoxes[${i}].desc=this.value">${esc(b.desc)}</textarea></div>`;
+    c.appendChild(d);
+  });
+}
+function addAboutBox() { DATA.aboutBoxes.push({ icon:'fa-solid fa-star', title:'New Box', desc:'Description here.' }); renderAboutBoxes(); }
+function removeAboutBox(i) { DATA.aboutBoxes.splice(i,1); renderAboutBoxes(); }
+
+/* ════ SKILLS ════ */
+function renderSkills() {
+  const c = document.getElementById('skills-list');
+  c.innerHTML = '';
+  DATA.skills.forEach((s, i) => {
+    const row = document.createElement('div');
+    row.className = 'skill-row';
+    row.innerHTML = `
+      <input type="text" value="${esc(s.name)}" placeholder="Skill name" oninput="DATA.skills[${i}].name=this.value">
+      <input type="range" min="0" max="100" value="${s.pct}" style="--val:${s.pct}%"
+        oninput="DATA.skills[${i}].pct=+this.value;this.style.setProperty('--val',this.value+'%');this.nextElementSibling.textContent=this.value+'%'">
+      <span class="skill-val">${s.pct}%</span>
+      <button class="btn-icon danger" onclick="removeSkill(${i})" title="Delete"><i class="fa-solid fa-trash"></i></button>`;
+    c.appendChild(row);
+  });
+}
+function addSkill() { DATA.skills.push({ name:'New Skill', pct:70 }); renderSkills(); }
+function removeSkill(i) { DATA.skills.splice(i,1); renderSkills(); }
+
+/* ════ TIMELINES ════ */
+function renderTimeline(containerId, arr) {
+  const c = document.getElementById(containerId);
+  c.innerHTML = '';
+  arr.forEach((item, i) => {
+    const d = document.createElement('div');
+    d.className = 'timeline-editor-item';
+    d.innerHTML = `
+      <div class="item-header">
+        <div class="item-title">${esc(item.title || 'Entry ' + (i+1))}</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div class="dot-picker">
+            ${['blue','green','purple'].map(col=>`<div class="dot-opt ${col}${item.color===col?' selected':''}" title="${col}" onclick="setDotColor('${containerId}',${i},'${col}',this)"></div>`).join('')}
+          </div>
+          <button class="btn-icon danger" onclick="removeTimelineItem('${containerId}',${i})"><i class="fa-solid fa-trash"></i> Remove</button>
+        </div>
+      </div>
+      <div class="form-row three">
+        <div class="form-group"><label>Period</label><input type="text" value="${esc(item.period)}" oninput="getArr('${containerId}')[${i}].period=this.value"></div>
+        <div class="form-group"><label>Title / Role</label><input type="text" value="${esc(item.title)}" oninput="getArr('${containerId}')[${i}].title=this.value;this.closest('.timeline-editor-item').querySelector('.item-title').textContent=this.value"></div>
+        <div class="form-group"><label>Organisation</label><input type="text" value="${esc(item.company)}" oninput="getArr('${containerId}')[${i}].company=this.value"></div>
+      </div>
+      <div class="form-group"><label>Description</label><textarea rows="2" oninput="getArr('${containerId}')[${i}].desc=this.value">${esc(item.desc)}</textarea></div>`;
+    c.appendChild(d);
+  });
+}
+function getArr(id) {
+  if (id==='work-timeline')   return DATA.workHistory;
+  if (id==='course-timeline') return DATA.courses;
+  if (id==='edu-timeline')    return DATA.education;
+}
+function addTimelineItem(cid, color) { getArr(cid).push({ period:'', title:'New Entry', company:'', desc:'', color }); renderTimeline(cid, getArr(cid)); }
+function removeTimelineItem(cid, i) { getArr(cid).splice(i,1); renderTimeline(cid, getArr(cid)); }
+function setDotColor(cid, i, color, el) {
+  getArr(cid)[i].color = color;
+  el.closest('.dot-picker').querySelectorAll('.dot-opt').forEach(d=>d.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+/* ════ MULTI-IMAGE SLOTS (up to 5 for projects.html slider) ════ */
+const MAX_PROJ_IMGS = 5;
+
+function renderProjImgSlots(dataUrls) {
+  /* dataUrls = array (may be shorter than MAX_PROJ_IMGS) */
+  const grid = document.getElementById('proj-imgs-grid');
+  grid.innerHTML = '';
+  for (let i = 0; i < MAX_PROJ_IMGS; i++) {
+    const slot = document.createElement('div');
+    slot.className = 'proj-img-slot' + (dataUrls[i] ? ' has-img' : '');
+    slot.dataset.idx = i;
+    if (dataUrls[i]) {
+      slot.innerHTML = `
+        <img src="${dataUrls[i]}" alt="Image ${i+1}" onclick="adminImgZoom(this)">
+        <span class="slot-num">${i+1}</span>
+        <button class="slot-rm" type="button" title="Remove" onclick="removeProjImg(${i},event)"><i class="fa-solid fa-xmark"></i></button>`;
+    } else {
+      slot.innerHTML = `
+        <i class="fa-solid fa-image"></i>
+        <span>${i === 0 ? 'Main image' : 'Image ' + (i+1)}</span>
+        <input type="file" accept="image/*" style="display:none" onchange="onSlotFile(this,${i})">`;
+      slot.addEventListener('click', function(e) {
+        if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT') return;
+        this.querySelector('input[type=file]').click();
+      });
+    }
+    grid.appendChild(slot);
+  }
+}
+
+function onSlotFile(input, idx) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    /* store into the current project imgs array */
+    if (!window._editProjImgs) window._editProjImgs = new Array(MAX_PROJ_IMGS).fill('');
+    window._editProjImgs[idx] = e.target.result;
+    renderProjImgSlots(window._editProjImgs);
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeProjImg(idx, e) {
+  if (e) e.stopPropagation();
+  if (!window._editProjImgs) window._editProjImgs = new Array(MAX_PROJ_IMGS).fill('');
+  window._editProjImgs[idx] = '';
+  renderProjImgSlots(window._editProjImgs);
+}
+
+function adminImgZoom(imgEl) {
+  /* quick lightbox for the admin preview */
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:zoom-out';
+  const im = document.createElement('img');
+  im.src = imgEl.src;
+  im.style.cssText = 'max-width:90vw;max-height:88vh;border-radius:6px;box-shadow:0 8px 48px rgba(0,0,0,.6)';
+  overlay.appendChild(im);
+  overlay.addEventListener('click', () => document.body.removeChild(overlay));
+  document.body.appendChild(overlay);
+}
+
+/* ════ CERTIFICATION IMAGE SLOTS (up to 8, shown as a slider on index.html) ════ */
+const MAX_CERT_IMGS = 10;
+
+function renderCertImgSlots() {
+  const grid = document.getElementById('cert-imgs-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  const certs = DATA.certifications;
+
+  for (let i = 0; i < MAX_CERT_IMGS; i++) {
+    const slot = document.createElement('div');
+    const hasImg = !!certs[i];
+    slot.className = 'proj-img-slot' + (hasImg ? ' has-img' : '');
+    slot.dataset.idx = i;
+
+    if (hasImg) {
+      slot.draggable = true;
+      slot.innerHTML = `
+        <img src="${certs[i]}" alt="Certificate ${i+1}" onclick="adminImgZoom(this)">
+        <span class="slot-num">${i+1}</span>
+        <button class="slot-rm" type="button" title="Remove" onclick="removeCertImg(${i},event)"><i class="fa-solid fa-xmark"></i></button>`;
+
+      slot.addEventListener('dragstart', e => {
+        e.dataTransfer.setData('text/plain', i);
+        setTimeout(() => slot.style.opacity = '0.4', 0);
+      });
+      slot.addEventListener('dragend', () => { slot.style.opacity = ''; });
+      slot.addEventListener('dragover', e => { e.preventDefault(); slot.style.borderColor = 'var(--accent)'; });
+      slot.addEventListener('dragleave', () => { slot.style.borderColor = ''; });
+      slot.addEventListener('drop', e => {
+        e.preventDefault();
+        slot.style.borderColor = '';
+        const fromIdx = +e.dataTransfer.getData('text/plain');
+        const toIdx = i;
+        if (fromIdx === toIdx) return;
+        const moved = certs.splice(fromIdx, 1)[0];
+        certs.splice(toIdx, 0, moved);
+        renderCertImgSlots();
+      });
+    } else {
+      slot.innerHTML = `
+        <i class="fa-solid fa-certificate"></i>
+        <span>Certificate ${i+1}</span>
+        <input type="file" accept="image/*" style="display:none" onchange="onCertSlotFile(this,${i})">`;
+      slot.addEventListener('click', function (e) {
+        if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT') return;
+        this.querySelector('input[type=file]').click();
+      });
+    }
+    grid.appendChild(slot);
+  }
+
+  const badge = document.getElementById('cert-count');
+  if (badge) badge.textContent = certs.filter(Boolean).length;
+  const ovBadge = document.getElementById('ov-cert-badge');
+  if (ovBadge) ovBadge.textContent = certs.filter(Boolean).length + ' images';
+}
+
+function onCertSlotFile(input, idx) {
+  const file = input.files[0]; if (!file) return;
+
+  /* Compress/resize before storing — certificate photos/scans (e.g. 1300x900 @96dpi)
+     can produce multi-MB base64 strings that bloat the generated <script> and risk
+     being silently truncated when copy-pasted. We cap the longest side at 1400px
+     and re-encode as JPEG at 0.82 quality, which keeps certificates crisp and
+     readable while keeping each image typically under ~150-250KB. */
+  const MAX_DIMENSION = 1400;
+  const JPEG_QUALITY   = 0.82;
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    const img = new Image();
+    img.onload = function () {
+      let { width, height } = img;
+      if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+        if (width >= height) {
+          height = Math.round(height * (MAX_DIMENSION / width));
+          width  = MAX_DIMENSION;
+        } else {
+          width  = Math.round(width * (MAX_DIMENSION / height));
+          height = MAX_DIMENSION;
+        }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width  = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#ffffff'; /* flatten transparency to white, avoids black backgrounds on JPEG */
+      ctx.fillRect(0, 0, width, height);
+      ctx.drawImage(img, 0, 0, width, height);
+
+      const compressed = canvas.toDataURL('image/jpeg', JPEG_QUALITY);
+      DATA.certifications[idx] = compressed;
+      renderCertImgSlots();
+
+      const beforeKB = (file.size / 1024).toFixed(0);
+      const afterKB  = ((compressed.length * 0.75) / 1024).toFixed(0); /* base64 -> approx bytes */
+      console.log('[Admin] Certificate ' + (idx+1) + ' compressed: ' + beforeKB + 'KB -> ~' + afterKB + 'KB');
+    };
+    img.onerror = function () {
+      showToast('Could not read that image file. Please try a different image.', true);
+    };
+    img.src = e.target.result;
+  };
+  reader.onerror = function () {
+    showToast('Failed to upload image.', true);
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeCertImg(idx, e) {
+  if (e) e.stopPropagation();
+  /* remove the slot entirely and shift subsequent images down,
+     so certificates stay in a contiguous order without gaps */
+  DATA.certifications.splice(idx, 1);
+  renderCertImgSlots();
+}
+
+/* ════ IMAGE UPLOADERS (thumbnail — index.html) ════ */
+function handleImgUpload(input, hiddenId, boxId, metaId, nameId) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const dataUrl = e.target.result;
+    // Store base64 in hidden field
+    document.getElementById(hiddenId).value = dataUrl;
+    // Show preview inside the box
+    const box = document.getElementById(boxId);
+    box.classList.add('has-img');
+    box.innerHTML = `<img class="img-preview-thumb" src="${dataUrl}" alt="preview">
+      <input type="file" id="${input.id}" accept="image/*" onchange="handleImgUpload(this,'${hiddenId}','${boxId}','${metaId}','${nameId}')" style="display:none">`;
+    // Show meta bar
+    document.getElementById(metaId).style.display = 'flex';
+    document.getElementById(nameId).textContent = file.name + ' (' + (file.size/1024).toFixed(1) + ' KB)';
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearImg(hiddenId, boxId, metaId, fileInputId) {
+  document.getElementById(hiddenId).value = '';
+  const box = document.getElementById(boxId);
+  box.classList.remove('has-img');
+  box.innerHTML = `<i class="fa-solid fa-image"></i>
+    <p><strong>Click to upload</strong> or drag &amp; drop</p>
+    <p>PNG, JPG, WEBP</p>
+    <input type="file" id="${fileInputId}" accept="image/*" onchange="handleImgUpload(this,'${hiddenId}','${boxId}','${metaId}','${fileInputId.replace('-file','')}-name')" style="display:none">`;
+  document.getElementById(metaId).style.display = 'none';
+}
+
+function restoreImgUpload(dataUrl, hiddenId, boxId, metaId, nameId, fileInputId) {
+  if (!dataUrl) return;
+  document.getElementById(hiddenId).value = dataUrl;
+  const box = document.getElementById(boxId);
+  const isBase64 = dataUrl.startsWith('data:');
+  box.classList.add('has-img');
+  box.innerHTML = `<img class="img-preview-thumb" src="${dataUrl}" alt="preview">
+    <input type="file" id="${fileInputId}" accept="image/*" onchange="handleImgUpload(this,'${hiddenId}','${boxId}','${metaId}','${nameId}')" style="display:none">`;
+  document.getElementById(metaId).style.display = 'flex';
+  document.getElementById(nameId).textContent = isBase64 ? 'Saved image (base64)' : dataUrl.split('/').pop();
+}
+
+/* ════ PROJECTS ════ */
+const CAT_LABEL = { automation:'Automation', testcase:'Test Cases', webDesign:'Web', ML:'Machine Learning', iot:'IoT' };
+const CAT_BADGE = { automation:'automation', testcase:'testcase', webDesign:'web', ML:'ml', iot:'iot' };
+
+function renderProjects() {
+  const tbody = document.getElementById('projects-tbody');
+  tbody.innerHTML = '';
+  DATA.projects.forEach((p, i) => {
+    const tr = document.createElement('tr');
+    tr.draggable = true;
+    tr.dataset.idx = i;
+    tr.innerHTML = `
+      <td style="text-align:center;padding:8px 6px">
+        <span class="drag-handle" title="Drag to reorder">&#8801;</span>
+      </td>
+      <td><strong>${esc(p.name)}</strong></td>
+      <td><span class="badge badge-${CAT_BADGE[p.category]}">${CAT_LABEL[p.category]}</span></td>
+      <td style="color:var(--text-mute)">${esc(p.role||'—')}</td>
+      <td style="color:var(--text-mute)">${esc(p.tools||'—')}</td>
+      <td>
+        <div class="action-btns">
+          <button class="btn-icon" onclick="editProject(${i})"><i class="fa-solid fa-pen"></i> Edit</button>
+          <button class="btn-icon danger" onclick="deleteProject(${i})"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </td>`;
+
+    /* ── drag events ── */
+    tr.addEventListener('dragstart', e => {
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', i);
+      setTimeout(() => tr.classList.add('dragging-row'), 0);
+    });
+    tr.addEventListener('dragend', () => {
+      tr.classList.remove('dragging-row');
+      tbody.querySelectorAll('tr').forEach(r => {
+        r.classList.remove('drag-over-top', 'drag-over-bottom');
+      });
+    });
+    tr.addEventListener('dragover', e => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      tbody.querySelectorAll('tr').forEach(r => r.classList.remove('drag-over-top','drag-over-bottom'));
+      const rect = tr.getBoundingClientRect();
+      const mid  = rect.top + rect.height / 2;
+      tr.classList.add(e.clientY < mid ? 'drag-over-top' : 'drag-over-bottom');
+    });
+    tr.addEventListener('dragleave', () => {
+      tr.classList.remove('drag-over-top','drag-over-bottom');
+    });
+    tr.addEventListener('drop', e => {
+      e.preventDefault();
+      const fromIdx = +e.dataTransfer.getData('text/plain');
+      const toIdx   = +tr.dataset.idx;
+      if (fromIdx === toIdx) return;
+      /* determine whether to insert before or after target */
+      const rect  = tr.getBoundingClientRect();
+      const after = e.clientY >= rect.top + rect.height / 2;
+      const insertAt = after ? toIdx + 1 : toIdx;
+      /* splice in DATA.projects */
+      const moved = DATA.projects.splice(fromIdx, 1)[0];
+      const adjusted = insertAt > fromIdx ? insertAt - 1 : insertAt;
+      DATA.projects.splice(adjusted, 0, moved);
+      renderProjects();
+      showToast('Project order updated! Remember to Save All.');
+    });
+
+    tbody.appendChild(tr);
+  });
+  const n = DATA.projects.length;
+  document.getElementById('proj-count').textContent = n;
+  document.getElementById('ov-projects').textContent = n;
+  const ob = document.getElementById('ov-proj-badge');
+  if (ob) ob.textContent = n + ' projects';
+}
+
+function openProjectModal(idx=null) {
+  editingProjectIdx = idx;
+  document.getElementById('modal-title').textContent = idx===null ? 'Add New Project' : 'Edit Project';
+  const p = idx!==null ? DATA.projects[idx] : {};
+
+  // shared
+  document.getElementById('m-name').value      = p.name      || '';
+  document.getElementById('m-category').value  = p.category  || 'automation';
+  document.getElementById('m-desc').value      = p.desc      || '';
+  document.getElementById('m-tools').value     = p.tools     || '';
+  document.getElementById('m-link').value      = p.link      || '';
+  // projects.html extra
+  document.getElementById('m-overview').value  = p.overview  || '';
+  document.getElementById('m-role').value      = p.role      || '';
+  document.getElementById('m-testtypes').value = p.testTypes || '';
+  document.getElementById('m-responsibilities').value = Array.isArray(p.responsibilities) ? p.responsibilities.join('\n') : (p.responsibilities || '');
+  document.getElementById('m-btn1label').value = p.btn1label || 'View Project';
+  document.getElementById('m-btn1url').value   = p.btn1url   || '';
+  document.getElementById('m-btn2label').value = p.btn2label || 'Test Cases';
+  document.getElementById('m-btn2url').value   = p.btn2url   || '';
+
+  // thumbnail (index.html)
+  clearImg('m-img','thumb-upload-box','thumb-meta','m-img-file');
+  if (p.img) restoreImgUpload(p.img,'m-img','thumb-upload-box','thumb-meta','thumb-name','m-img-file');
+
+  // multi-image slots (projects.html)
+  const saved = Array.isArray(p.projImgs) ? p.projImgs.slice(0, MAX_PROJ_IMGS) : (p.projImg ? [p.projImg] : []);
+  window._editProjImgs = new Array(MAX_PROJ_IMGS).fill('');
+  saved.forEach((v,i) => { window._editProjImgs[i] = v || ''; });
+  renderProjImgSlots(window._editProjImgs);
+
+  document.getElementById('project-modal-overlay').classList.add('open');
+}
+function closeProjectModal() { document.getElementById('project-modal-overlay').classList.remove('open'); }
+function saveProject() {
+  const obj = {
+    name:      document.getElementById('m-name').value.trim(),
+    category:  document.getElementById('m-category').value,
+    desc:      document.getElementById('m-desc').value.trim(),
+    img:       document.getElementById('m-img').value.trim(),
+    tools:     document.getElementById('m-tools').value.trim(),
+    link:      document.getElementById('m-link').value.trim(),
+    // projects.html
+    overview:  document.getElementById('m-overview').value.trim(),
+    role:      document.getElementById('m-role').value.trim(),
+    testTypes: document.getElementById('m-testtypes').value.trim(),
+    responsibilities: document.getElementById('m-responsibilities').value
+                         .split('\n')
+                         .map(line => line.trim())
+                         .filter(line => line.length > 0),
+    // multi-images: store as array, filter empty slots
+    projImgs:  (window._editProjImgs || []).filter(Boolean),
+    btn1label: document.getElementById('m-btn1label').value.trim(),
+    btn1url:   document.getElementById('m-btn1url').value.trim(),
+    btn2label: document.getElementById('m-btn2label').value.trim(),
+    btn2url:   document.getElementById('m-btn2url').value.trim()
+  };
+  if (!obj.name) { showToast('Project name is required!', true); return; }
+  if (editingProjectIdx!==null) DATA.projects[editingProjectIdx] = obj;
+  else DATA.projects.push(obj);
+  renderProjects();
+  closeProjectModal();
+  showToast('Project saved!');
+}
+function editProject(i)   { openProjectModal(i); }
+function deleteProject(i) {
+  if (confirm('Delete "' + DATA.projects[i].name + '"?')) {
+    DATA.projects.splice(i,1);
+    renderProjects();
+    showToast('Project deleted.');
+  }
+}
+
+/* ════ SERVICES ════ */
+function renderServices() {
+  const c = document.getElementById('services-list');
+  c.innerHTML = '';
+  DATA.services.forEach((s, i) => {
+    const d = document.createElement('div');
+    d.className = 'service-ed-item';
+    d.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div style="font-size:13px;color:var(--text-mid);font-weight:600">
+          <i class="${s.icon}" style="margin-right:6px;color:var(--accent-dk)"></i>${esc(s.title)}
+        </div>
+        <button class="btn-icon danger" onclick="removeService(${i})"><i class="fa-solid fa-trash"></i> Remove</button>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>FA Icon Class</label><input type="text" value="${esc(s.icon)}" placeholder="fa-solid fa-vial" oninput="DATA.services[${i}].icon=this.value"></div>
+        <div class="form-group"><label>Title</label><input type="text" value="${esc(s.title)}" oninput="DATA.services[${i}].title=this.value"></div>
+      </div>
+      <div class="form-group"><label>Description</label><textarea rows="2" oninput="DATA.services[${i}].desc=this.value">${esc(s.desc)}</textarea></div>`;
+    c.appendChild(d);
+  });
+}
+function addService() { DATA.services.push({ icon:'fa-solid fa-star', title:'New Service', desc:'Description.' }); renderServices(); }
+function removeService(i) { DATA.services.splice(i,1); renderServices(); }
+
+/* ════ FUN FACTS ════ */
+function renderFunFacts() {
+  const c = document.getElementById('funfacts-list');
+  c.innerHTML = '';
+  DATA.funfacts.forEach((f, i) => {
+    const d = document.createElement('div');
+    d.className = 'funfact-item';
+    d.innerHTML = `
+      <label>Count</label>
+      <input type="number" value="${f.count}" oninput="DATA.funfacts[${i}].count=+this.value">
+      <label style="margin-top:2px">Label</label>
+      <input type="text" value="${esc(f.label)}" oninput="DATA.funfacts[${i}].label=this.value">
+      <button class="btn-icon danger" style="margin-top:8px;align-self:flex-start" onclick="removeFunFact(${i})">
+        <i class="fa-solid fa-trash"></i> Remove
+      </button>`;
+    c.appendChild(d);
+  });
+}
+function addFunFact() { DATA.funfacts.push({ count:0, label:'New Stat' }); renderFunFacts(); }
+function removeFunFact(i) { DATA.funfacts.splice(i,1); renderFunFacts(); }
+
+/* ════ SAVE / LOAD ════ */
+function saveAll() {
+  try { localStorage.setItem('tajwar_portfolio_data', JSON.stringify(DATA)); showToast('All changes saved!'); }
+  catch(e) { showToast('Save failed: ' + e.message, true); }
+}
+function loadSaved() {
+  try { const s = localStorage.getItem('tajwar_portfolio_data'); if (s) Object.assign(DATA, JSON.parse(s)); }
+  catch(e) {}
+}
+
+/* ════ EXPORT ════ */
+function setTab(t) {
+  activeSnippetTab = t;
+  document.querySelectorAll('.snippet-tab').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + t).classList.add('active');
+  document.getElementById('snippet-output').style.display = 'none';
+}
+
+function generateSnippet() {
+  let snippet = '';
+  if (activeSnippetTab === 'index') {
+    document.getElementById('snippet-label').textContent = 'Generated script — paste before </body> in index.html';
+    snippet = buildIndexSnippet();
+
+    /* Warn if certificate images are still unexpectedly large after compression —
+       this can happen with very high-resolution source files. A large payload
+       risks being truncated when copy-pasting into some editors/clipboards. */
+    const certKB = (JSON.stringify(DATA.certifications).length / 1024);
+    if (certKB > 2000) {
+      showToast('Certificate images total ~' + Math.round(certKB/1024) + 'MB — consider removing one or two if paste fails.', true);
+    }
+  } else {
+    document.getElementById('snippet-label').textContent = 'Generated script — paste before </body> in projects.html';
+    snippet = buildProjectsSnippet();
+  }
+  document.getElementById('snippet-text').value = snippet;
+  document.getElementById('snippet-output').style.display = 'block';
+  if (activeSnippetTab !== 'index' || (JSON.stringify(DATA.certifications).length / 1024) <= 2000) {
+    showToast('Script generated!');
+  }
+}
+
+function buildIndexSnippet() {
+  return `<script>
+/* AUTO-GENERATED BY TAJWAR PORTFOLIO ADMIN — index.html injection */
+(function(){
+  var PDATA = ${JSON.stringify({ carousel: DATA.carousel, projects: DATA.projects, funfacts: DATA.funfacts, certifications: DATA.certifications }, null, 2)};
+
+  /* 1. Carousel slides */
+  var carEl = document.getElementById('owl-intro-text');
+  if(carEl){
+    carEl.innerHTML = PDATA.carousel.map(function(s){
+      return '<div class="item"><h1>'+s.h1+'<\/h1><p>'+s.p+'<\/p><div class="extra-space-l"><\/div><\/div>';
+    }).join('');
+    if(window.$) $(carEl).owlCarousel({singleItem:true,autoPlay:true,navigation:false,pagination:true});
+  }
+
+  /* 2. Portfolio grid — capped at 9 visible cards per filter (3 rows of 3) */
+  var portEl = document.getElementById('portfolio');
+  var HOME_PORTFOLIO_LIMIT = 9;
+
+  if(portEl){
+    portEl.innerHTML = PDATA.projects.map(function(p){
+      return '<div class="col-xs-12 col-sm-4 '+p.category+'">'
+        +'<div class="portfolio_single_content">'
+        +'<img src="'+p.img+'" alt="'+p.name+'" />'
+        +'<div><a href="'+p.link+'">'
+        +'<h4>'+p.name+'<\/h4>'
+        +'<span>'+p.desc+'<br><br>'
+        +(p.tools ? '<h6>Tools used: '+p.tools+'<\/h6>' : '')
+        +'<h6>{Github Link} <i class="fa fa-arrow-right"><\/i><\/h6>'
+        +'<\/span><\/a><\/div><\/div><\/div>';
+    }).join('');
+
+    /* show only the first N matching cards for a given filter, hide the rest */
+    function applyHomePortfolioFilter(filterClass){
+      var cards = portEl.querySelectorAll('.col-sm-4');
+      var shown = 0;
+      cards.forEach(function(card){
+        var matches = (filterClass === '*') || card.classList.contains(filterClass);
+        if(matches && shown < HOME_PORTFOLIO_LIMIT){
+          card.style.display = '';
+          shown++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+      if(window.$ && $.fn.isotope){ $('#portfolio').isotope('layout'); }
+    }
+
+    /* init isotope for fitRows layout (visible cards only) */
+    if(window.$ && $.fn.isotope){
+      $('#portfolio').isotope({ itemSelector:'.col-sm-4', layoutMode:'fitRows' });
+    }
+
+    /* initial state: show first 9 overall */
+    applyHomePortfolioFilter('*');
+
+    /* filter menu clicks — capture phase + stopImmediatePropagation
+       so theme.js's own (uncapped) isotope filter handler never runs */
+    document.querySelectorAll('#filters a').forEach(function(link){
+      link.addEventListener('click', function(e){
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        document.querySelectorAll('#filters li').forEach(function(li){
+          li.classList.remove('active_prot_menu');
+        });
+        this.parentElement.classList.add('active_prot_menu');
+
+        var f = this.getAttribute('data-filter');
+        var cls = (f === '*') ? '*' : f.replace('.', '');
+        applyHomePortfolioFilter(cls);
+      }, true); /* capture: fires before theme.js's delegated handler */
+    });
+
+    /* neutralise theme.js's own isotope filter binding on window load,
+       since it re-attaches a competing (uncapped) click handler to #filters a */
+    window.addEventListener('load', function(){
+      if(window.$){
+        $('#filters').off('click', 'a'); /* remove theme.js's delegated handler */
+        $('#portfolio').isotope({ itemSelector:'.col-sm-4', layoutMode:'fitRows' });
+        var activeLink = document.querySelector('#filters li.active_prot_menu a');
+        var f = activeLink ? activeLink.getAttribute('data-filter') : '*';
+        var cls = (f === '*') ? '*' : f.replace('.', '');
+        applyHomePortfolioFilter(cls);
+      }
+    });
+  }
+
+  /* 3. "View More on" button → links to projects.html */
+  document.querySelectorAll('.btn-default.btn-lg-xl, a[href*="repositories"]').forEach(function(btn){
+    btn.href = 'projects.html';
+    btn.removeAttribute('target');
+    btn.innerHTML = 'View More on &nbsp;<i class="fa fa-list"><\/i>';
+  });
+
+  /* 4. Fun facts counters */
+  var counters = document.querySelectorAll('.timer, [data-to]');
+  PDATA.funfacts.forEach(function(f,i){ if(counters[i]) counters[i].setAttribute('data-to', f.count); });
+
+  /* 5. Certification slider — fully self-contained (builds its own engine,
+        does not depend on any other script being present on the page).
+        Isolated in try/catch so a problem here can never break the
+        carousel, portfolio grid, or fun facts above. */
+  try {
+    var CERT_IMAGES = Array.isArray(PDATA.certifications) ? PDATA.certifications.filter(Boolean) : [];
+    var certTrack  = document.getElementById('cert-slider-track');
+    var certDots   = document.getElementById('cert-slider-dots');
+    var certWrap   = document.querySelector('.cert-slider-wrap');
+
+    if (certTrack) {
+      var certIdx = 0;
+      var certTimer = null;
+      var CERT_AUTO_DELAY = 6000;
+
+      /* build (or reuse) the lightbox overlay once */
+      var certLightbox = document.getElementById('cert-lightbox');
+      if (!certLightbox) {
+        certLightbox = document.createElement('div');
+        certLightbox.id = 'cert-lightbox';
+        certLightbox.className = 'cert-lightbox-overlay';
+        certLightbox.innerHTML = '<button class="cert-lightbox-close" aria-label="Close">&#215;<\/button>'
+          + '<img id="cert-lightbox-img" src="" alt="Certificate enlarged view">';
+        document.body.appendChild(certLightbox);
+        certLightbox.addEventListener('click', function(e){ if(e.target===certLightbox) certLightboxClose(); });
+        certLightbox.querySelector('.cert-lightbox-close').addEventListener('click', certLightboxClose);
+        document.addEventListener('keydown', function(e){
+          if (certLightbox.classList.contains('open') && e.key === 'Escape') certLightboxClose();
+        });
+      }
+
+      function certUpdateTrack(){
+        if(!CERT_IMAGES.length) return;
+        certTrack.style.transform = 'translateX(-' + (certIdx*100) + '%)';
+        if(certDots) certDots.querySelectorAll('.dot').forEach(function(d,i){ d.classList.toggle('active', i===certIdx); });
+      }
+      function certRestartAuto(){
+        if(certTimer) clearInterval(certTimer);
+        if(CERT_IMAGES.length > 1) certTimer = setInterval(function(){ certSlideFn(1); }, CERT_AUTO_DELAY);
+      }
+      function certSlideFn(dir){
+        if(!CERT_IMAGES.length) return;
+        certIdx = ((certIdx+dir) % CERT_IMAGES.length + CERT_IMAGES.length) % CERT_IMAGES.length;
+        certUpdateTrack(); certRestartAuto();
+      }
+      function certGoToFn(i){ certIdx = i; certUpdateTrack(); certRestartAuto(); }
+      function certLightboxOpenFn(i){
+        var img = document.getElementById('cert-lightbox-img');
+        if(!img || !CERT_IMAGES[i]) return;
+        img.src = CERT_IMAGES[i];
+        certLightbox.classList.add('open');
+        if(certTimer) clearInterval(certTimer);
+      }
+      function certLightboxClose(){
+        certLightbox.classList.remove('open');
+        certRestartAuto();
+      }
+
+      /* expose globally so the prev/next buttons and the lightbox's inline
+         onclick handlers (already present in the static HTML) keep working */
+      window.certSlide = certSlideFn;
+      window.certGoTo = certGoToFn;
+      window.certLightboxOpen = certLightboxOpenFn;
+      window.certLightboxClose = certLightboxClose;
+
+      if (!CERT_IMAGES.length) {
+        certTrack.innerHTML = '<div class="cert-empty-msg">Certificates will appear here once added from the admin dashboard.</div>';
+        if(certDots) certDots.innerHTML = '';
+        var navBtns = certWrap ? certWrap.querySelectorAll('.cert-slider-btn') : [];
+        navBtns.forEach(function(b){ b.style.display = 'none'; });
+      } else {
+        certTrack.innerHTML = CERT_IMAGES.map(function(src,i){
+          return '<div class="cert-slide" onclick="certLightboxOpen('+i+')"><img src="'+src+'" alt="Certificate '+(i+1)+'"><\/div>';
+        }).join('');
+        if(certDots){
+          certDots.innerHTML = CERT_IMAGES.map(function(_,i){
+            return '<span class="dot'+(i===0?' active':'')+'" onclick="certGoTo('+i+')"><\/span>';
+          }).join('');
+        }
+        var showNav = CERT_IMAGES.length > 1;
+        var navBtns2 = certWrap ? certWrap.querySelectorAll('.cert-slider-btn') : [];
+        navBtns2.forEach(function(b){ b.style.display = showNav ? '' : 'none'; });
+        if(certDots) certDots.style.display = showNav ? '' : 'none';
+        certIdx = 0;
+        certUpdateTrack();
+        certRestartAuto();
+      }
+
+      console.log('[Admin] Certifications slider rendered with ' + CERT_IMAGES.length + ' image(s).');
+    } else {
+      console.warn('[Admin] #cert-slider-track not found — the Certifications section markup may be missing from this page.');
+    }
+  } catch (certErr) {
+    console.error('[Admin] Certifications injection failed (carousel/projects/funfacts above are unaffected):', certErr);
+  }
+
+  console.log('[Admin] index.html data injected.');
+})();
+<\/script>`;
+}
+
+function buildProjectsSnippet() {
+  return `<script>
+/* AUTO-GENERATED BY TAJWAR PORTFOLIO ADMIN — projects.html injection */
+(function(){
+  var PDATA = ${JSON.stringify({ projects: DATA.projects }, null, 2)};
+
+  /* Inject accordion project items into #projects-section .col-md-10 */
+  var container = document.getElementById('project-list');
+  if(!container) container = document.querySelector('#projects-section .col-md-10');
+  if(!container) container = document.querySelector('#projects-section .col-md-10.col-md-offset-1');
+  if(container){
+    container.innerHTML = PDATA.projects.map(function(p, i){
+      var btn1 = (p.btn1label && p.btn1url)
+        ? '<a href="'+p.btn1url+'" class="btn btn-default btn-sm">'+p.btn1label+'<\/a>' : '';
+      var btn2 = (p.btn2label && p.btn2url && p.btn2url !== '#')
+        ? '<a href="'+p.btn2url+'" class="btn btn-blank btn-sm">'+p.btn2label+'<\/a>' : '';
+      var githubBtn = (p.link && p.link !== '#')
+        ? '<a href="'+p.link+'" class="btn btn-blank btn-sm" target="_blank"><i class="fa fa-github"><\/i> GitHub<\/a>' : '';
+
+      /* resolve images: support new projImgs[] array OR legacy projImg string */
+      var imgs = Array.isArray(p.projImgs) && p.projImgs.length
+        ? p.projImgs.filter(Boolean)
+        : (p.projImg ? [p.projImg] : []);
+
+      var sliderId = 'slider-inj-' + i;
+      var dotsId   = 'dots-inj-' + i;
+
+      var slides = imgs.map(function(src, si){
+        return '<img src="'+src+'" alt="'+p.name+'" onclick="projLightbox(\\'' + sliderId + '\\',' + si + ',event)">';
+      }).join('');
+
+      var sliderBlock = imgs.length
+        ? '<div class="proj-slider-wrap">'
+            + '<div class="proj-slider" id="'+sliderId+'">'
+            + '<button class="proj-slider-btn prev" onclick="projSlide(\\'' + sliderId + '\\',-1,event)">&#8249;<\/button>'
+            + '<div class="proj-slider-track">'+slides+'<\/div>'
+            + '<button class="proj-slider-btn next" onclick="projSlide(\\'' + sliderId + '\\',1,event)">&#8250;<\/button>'
+            + '<\/div>'
+            + '<div class="proj-slider-dots" id="'+dotsId+'"><\/div>'
+            + '<\/div>'
+        : '';
+
+      var respList = Array.isArray(p.responsibilities) ? p.responsibilities.filter(Boolean) : [];
+      var respBlock = respList.length
+        ? '<h5 class="resp-heading">Responsibilities<\/h5><ul class="project-responsibilities">'
+            + respList.map(function(r){ return '<li>'+r+'<\/li>'; }).join('')
+            + '<\/ul>'
+        : '';
+
+      return '<div class="project-item '+p.category+'">'
+        +'<div class="project-header" onclick="toggleProject(this)">'
+        +'<h4>'+p.name+'<\/h4>'
+        +'<span class="toggle-icon">+<\/span>'
+        +'<\/div>'
+        +'<div class="project-body">'
+        +sliderBlock
+        +'<h5>Project Overview<\/h5>'
+        +'<p>'+(p.overview||p.desc)+'<\/p>'
+        +'<ul class="project-meta">'
+        +(p.role      ? '<li><strong>Role:<\/strong> '+p.role+'<\/li>'            : '')
+        +(p.testTypes ? '<li><strong>Test Types:<\/strong> '+p.testTypes+'<\/li>' : '')
+        +(p.tools     ? '<li><strong>Tools:<\/strong> '+p.tools+'<\/li>'          : '')
+        +'<\/ul>'
+        +respBlock
+        +'<div class="project-buttons">'+btn1+btn2+githubBtn+'<\/div>'
+        +'<\/div>'
+        +'<\/div>';
+    }).join('');
+  }
+
+  /* init injected sliders */
+  setTimeout(function(){
+    PDATA.projects.forEach(function(p, i) {
+      var sid = 'slider-inj-' + i;
+      if (document.getElementById(sid)) {
+        _buildDots(sid);
+        _sliderGo(sid, 0);
+      }
+    });
+  }, 0);
+
+  console.log('[Admin] projects.html data injected — '+PDATA.projects.length+' projects.');
+})();
+<\/script>`;
+}
+
+function copySnippet() {
+  const ta = document.getElementById('snippet-text');
+  ta.select(); document.execCommand('copy');
+  showToast('Copied to clipboard!');
+}
+
+/* ════ TOAST ════ */
+let _tt;
+function showToast(msg, isError=false) {
+  const t   = document.getElementById('toast');
+  const ico = document.getElementById('toast-icon');
+  document.getElementById('toast-msg').textContent = msg;
+  t.className = 'toast' + (isError?' error':'');
+  ico.className = isError ? 'fa-solid fa-circle-exclamation' : 'fa-solid fa-circle-check';
+  void t.offsetWidth;
+  t.classList.add('show');
+  clearTimeout(_tt);
+  _tt = setTimeout(()=>t.classList.remove('show'), 2800);
+}
+
+/* ════ HELPERS ════ */
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+/* ════ INIT ════ */
+document.addEventListener('DOMContentLoaded', () => {
+  loadSaved();
+  renderCarousel();
+  renderAboutBoxes();
+  renderSkills();
+  renderTimeline('work-timeline',   DATA.workHistory);
+  renderTimeline('course-timeline', DATA.courses);
+  renderTimeline('edu-timeline',    DATA.education);
+  renderProjects();
+  renderServices();
+  renderFunFacts();
+  renderCertImgSlots();
+
+  // Drag-and-drop on image upload boxes
+  ['thumb-upload-box','proj-upload-box'].forEach(function(boxId) {
+    var box = document.getElementById(boxId);
+    if (!box) return;
+    box.addEventListener('dragover', function(e){ e.preventDefault(); box.style.borderColor='var(--accent)'; box.style.background='#f0f5f5'; });
+    box.addEventListener('dragleave', function(){ box.style.borderColor=''; box.style.background=''; });
+    box.addEventListener('drop', function(e){
+      e.preventDefault(); box.style.borderColor=''; box.style.background='';
+      var file = e.dataTransfer.files[0];
+      if (!file || !file.type.startsWith('image/')) return;
+      var isThumb = boxId === 'thumb-upload-box';
+      var fakeInput = { files:[file], id: isThumb ? 'm-img-file' : 'm-projimg-file' };
+      handleImgUpload(fakeInput,
+        isThumb ? 'm-img'     : 'm-projimg',
+        boxId,
+        isThumb ? 'thumb-meta': 'proj-meta',
+        isThumb ? 'thumb-name': 'proj-name'
+      );
+    });
+  });
+});
+</script>
+</body>
+</html>
